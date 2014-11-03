@@ -31,7 +31,7 @@ class Clusterer
   # returns a hash with the centroid for every cluster
   def self.get_centroids(clusters)
     clusters.inject({}) do |h, (clusterId, values)|
-      h[clusterId] = values.transpose.map {|x| x.reduce(:+) / x.length }
+      h[clusterId] = values.transpose.map { |x| x.reduce(:+) / x.length }
       h
     end
   end
