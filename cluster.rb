@@ -11,11 +11,13 @@ def cluster(data, nclusters = 3, maxit = 10)
   get_clusters clustering, data
 end
 
+# assigns a cluster randomly to each data tuple
 def init_random(ntuples, nclusters)
   k = (1.0 * ntuples / nclusters).ceil
   ((1..nclusters).to_a * k).shuffle.take(ntuples)
 end
 
+# returns a hash with the data tuples clustered
 def get_clusters(clustering, data)
   clustering.zip(data).inject({}) do |h, x|
     (h[x.first] ||= []) << x.last
@@ -23,6 +25,7 @@ def get_clusters(clustering, data)
   end
 end
 
+# returns a hash with the centroid for every cluster
 def get_centroids(clusters)
   clusters.inject({}) do |h, (clusterId, values)|
     h[clusterId] = values.transpose.map {|x| x.reduce(:+) / x.length }
@@ -30,21 +33,24 @@ def get_centroids(clusters)
   end
 end
 
+# assigns the closer cluster to each data tuple
 def update_clustering(data, centroids)
   data.inject([]) { |ary, p| ary << closer_centroid(p, centroids) }
 end
 
 # Auxiliary functions
 
-def squared_distance(p, q)
-  p.zip(q).map { |x| (x[0] - x[1])**2 }.reduce(:+)
-end
-
+# returns the id of the cluster with the closer centroid to p
 def closer_centroid(p, centroids)
   centroids.inject({}) do |h, (clusterId, centroid)|
     h[clusterId] = squared_distance p, centroid
     h
   end.min_by { |clusterId, squaredDistance| squaredDistance }.first
+end
+
+# returns the squared distance from p to q
+def squared_distance(p, q)
+  p.zip(q).map { |x| (x[0] - x[1])**2 }.reduce(:+)
 end
 
 __END__
